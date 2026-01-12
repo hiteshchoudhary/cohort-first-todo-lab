@@ -1,0 +1,33 @@
+# Docker Compose Configuration for MongoDB
+#
+# This file makes it easy to run MongoDB locally without installing it.
+#
+# Quick Start:
+#   docker-compose up -d     # Start MongoDB in background
+#   docker-compose down      # Stop MongoDB
+#   docker-compose down -v   # Stop and delete all data
+#
+# MongoDB will be available at: mongodb://localhost:27017/todo_api_lab
+
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0                      # MongoDB version 7.0
+    container_name: todo-api-mongodb      # Container name for easy reference
+    restart: unless-stopped               # Auto-restart on crashes
+    ports:
+      - "27017:27017"                     # Expose MongoDB on default port
+    environment:
+      MONGO_INITDB_DATABASE: todo_api_lab # Create this database on first run
+    volumes:
+      - mongodb_data:/data/db             # Persist data between restarts
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s                       # Check every 10 seconds
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongodb_data:
+    driver: local                         # Store data locally on your machine
